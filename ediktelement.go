@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -23,7 +26,7 @@ import (
 		x Dienststelle
 		x Kategorie(n)
 		x Sonstige Hinweise
-		x Kurzgutachten
+		- Kurzgutachten
 		- Schätzwert
 		x Besichtigungszeit
 		x Versteigerung ehemalige Hofstelle (24.09.2025 10:15)
@@ -212,4 +215,68 @@ func (ees EdiktElements) Liegenschaftsadresse() string {
 		return "---"
 	}
 	return ee.Value
+}
+
+func (ees EdiktElements) Langgutachten() []string {
+	ee, ok := ees["Langgutachten"]
+	if !ok {
+		return make([]string, 0)
+	}
+
+	base, err := url.Parse(ees.AllDocLink())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ret := make([]string, 0)
+	ee.Obj.Find("a[href]").Each(func(i int, s *goquery.Selection) {
+		if href, ok := s.Attr("href"); ok {
+			rel, _ := url.Parse(href)
+			abs := base.ResolveReference(rel).String()
+			ret = append(ret, abs)
+		}
+	})
+
+	return ret
+}
+
+func (ees EdiktElements) Kurzgutachten() []string {
+	ee, ok := ees["Kurzgutachten"]
+	if !ok {
+		return make([]string, 0)
+	}
+
+	base, err := url.Parse(ees.AllDocLink())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ret := make([]string, 0)
+	ee.Obj.Find("a[href]").Each(func(i int, s *goquery.Selection) {
+		if href, ok := s.Attr("href"); ok {
+			rel, _ := url.Parse(href)
+			abs := base.ResolveReference(rel).String()
+			ret = append(ret, abs)
+		}
+	})
+
+	return ret
+}
+
+func (ees EdiktElements) KurzgutachtenText() string {
+	links := ees.Kurzgutachten()
+	if len(links) == 0 {
+		return "---"
+	}
+	if len(links) > 1 {
+		log.Fatal("too many Kurzgutachten links")
+	}
+
+	doc, _ := request(links[0])
+	text := doc.Text()
+	text = strings.ReplaceAll(text, "\n", "|")
+	re := regexp.MustCompile(`\s+`)
+	text = re.ReplaceAllString(text, " ")
+	text = strings.TrimSpace(text)
+	return text
 }

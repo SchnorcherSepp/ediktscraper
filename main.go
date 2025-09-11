@@ -45,6 +45,9 @@ func main() {
 		fmt.Printf("PlzOrt:\t%s\n", ees.PlzOrt())
 		fmt.Printf("Entfernung:\t%d km\n", ees.Entfernung())
 		fmt.Printf("AllDocLink:\t%s\n", ees.AllDocLink())
+		fmt.Printf("Kurzgutachten:\t%v\n", ees.Kurzgutachten())
+		fmt.Printf("Langgutachten:\t%v\n", ees.Langgutachten())
+		fmt.Printf("KurzgutachtenText:\t%s\n", ees.KurzgutachtenText())
 		fmt.Printf("\n")
 
 	}
