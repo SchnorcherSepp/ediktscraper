@@ -12,6 +12,8 @@ const (
 
 func main() {
 
+	db := LoadDB()
+
 	ediktAlldocURLs := CollectEdiktAlldocURLs([]string{buildableLotUrl, agriForestLandUrl})
 
 	for _, ediktAlldocURL := range ediktAlldocURLs {
@@ -21,6 +23,10 @@ func main() {
 		sw := edikt.Schaetzwert()
 		if sw <= 0 || sw > maxCost {
 			println("skip", sw, "eur")
+			continue
+		}
+		if isKnown := db.AddEdikt(ediktAlldocURL); isKnown {
+			println("known", sw, "eur")
 			continue
 		}
 
