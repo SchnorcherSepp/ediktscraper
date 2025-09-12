@@ -39,7 +39,7 @@ func main() {
 		fmt.Printf("Kurzgutachten: %s\n", edikt.KurzgutachtenLink(base))
 		fmt.Printf("Langgutachten: %v\n", edikt.LanggutachtenLinks(base))
 		fmt.Printf("Langgutachten: %d\n", len(edikt.Langgutachten(base)))
-		fmt.Printf("KurzgutachtenText: %s\n", edikt.Kurzgutachten(base))
+		//fmt.Printf("KurzgutachtenText: %s\n", edikt.Kurzgutachten(base))
 		fmt.Printf("------------------------------\n")
 	}
 
