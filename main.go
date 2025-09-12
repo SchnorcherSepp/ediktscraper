@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	maxCost           = 30000
@@ -10,45 +12,29 @@ const (
 
 func main() {
 
-	// collect all edicts
-	edikts := make([]EdiktElements, 0)
-	for _, link := range []string{buildableLotUrl, agriForestLandUrl} {
-		// get all doc links
-		doc, baseUrl := request(link)
-		allDocLinks := findAllDocLinks(doc, baseUrl)
+	ediktAlldocURLs := CollectEdiktAlldocURLs([]string{buildableLotUrl, agriForestLandUrl})
 
-		// get all edikt elements
-		for _, allDocLink := range allDocLinks {
-			doc, baseUrl = request(allDocLink)
-			ees := findEdiktElements(doc, allDocLink)
-			edikts = append(edikts, ees)
-		}
-	}
+	for _, ediktAlldocURL := range ediktAlldocURLs {
+		doc, _, base := RequestPage(ediktAlldocURL)
+		edikt := ParseEdikt(doc)
 
-	// check edicts
-	var countInvalid, countExpensive int
-
-	for _, ees := range edikts {
-		sw := ees.Schaetzwert()
-		if sw < 0 {
-			countInvalid++
-			continue
-		}
-		if sw > maxCost {
-			countExpensive++
+		sw := edikt.Schaetzwert()
+		if sw <= 0 || sw > maxCost {
+			println("skip", sw, "eur")
 			continue
 		}
 
-		fmt.Printf("Schätzwert:\t%d EUR\n", sw)
-		fmt.Printf("Objektgröße:\t%d m²\n", ees.Objektgroesse())
-		fmt.Printf("Grundstücksgröße:\t%d m²\n", ees.Grundstuecksgroesse())
-		fmt.Printf("PlzOrt:\t%s\n", ees.PlzOrt())
-		fmt.Printf("Entfernung:\t%d km\n", ees.Entfernung())
-		fmt.Printf("AllDocLink:\t%s\n", ees.AllDocLink())
-		fmt.Printf("Kurzgutachten:\t%v\n", ees.Kurzgutachten())
-		fmt.Printf("Langgutachten:\t%v\n", ees.Langgutachten())
-		fmt.Printf("KurzgutachtenText:\t%s\n", ees.KurzgutachtenText())
-		fmt.Printf("\n")
-
+		fmt.Printf("Schätzwert: %d EUR\n", sw)
+		fmt.Printf("Objektgröße: %d m²\n", edikt.Objektgroesse())
+		fmt.Printf("Grundstücksgröße: %d m²\n", edikt.Grundstuecksgroesse())
+		fmt.Printf("PlzOrt: %s\n", edikt.PlzOrt())
+		fmt.Printf("Entfernung: %d km\n", edikt.Entfernung())
+		fmt.Printf("AllDocLink: %s\n", ediktAlldocURL)
+		fmt.Printf("Kurzgutachten: %s\n", edikt.KurzgutachtenLink(base))
+		fmt.Printf("Langgutachten: %v\n", edikt.LanggutachtenLinks(base))
+		fmt.Printf("Langgutachten: %d\n", len(edikt.Langgutachten(base)))
+		fmt.Printf("KurzgutachtenText: %s\n", edikt.Kurzgutachten(base))
+		fmt.Printf("------------------------------\n")
 	}
+
 }
