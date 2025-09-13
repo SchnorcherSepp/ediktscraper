@@ -12,6 +12,9 @@ type DB struct {
 	Edikt map[string]bool
 }
 
+// AddEdikt adds the given alldocURL to the set of known entries.
+// It returns true if the URL was already present before this call.
+// The method initializes the map on first use and persists the DB to disk.
 func (db *DB) AddEdikt(alldocURL string) (isKnown bool) {
 	if db.Edikt == nil {
 		db.Edikt = make(map[string]bool)
@@ -22,6 +25,8 @@ func (db *DB) AddEdikt(alldocURL string) (isKnown bool) {
 	return isKnown
 }
 
+// Save writes the DB to disk at dbPath using gob encoding.
+// It panics on I/O or encoding errors.
 func (db *DB) Save() {
 	f, err := os.Create(dbPath)
 	if err != nil {
@@ -33,6 +38,9 @@ func (db *DB) Save() {
 	}
 }
 
+// LoadDB loads a DB from dbPath using gob decoding.
+// If the file does not exist, it returns a new empty DB.
+// It panics on any other error.
 func LoadDB() *DB {
 	f, err := os.Open(dbPath)
 	if err != nil {
