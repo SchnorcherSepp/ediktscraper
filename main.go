@@ -37,19 +37,19 @@ func main() {
 		// Validate entry: require positive appraised value and at least one long-appraisal link.
 		sw := edikt.Schaetzwert()
 		if sw <= 0 || len(edikt.LanggutachtenLinks(base)) == 0 {
-			println("Canceled", sw, "eur")
+			fmt.Println("Canceled", sw, "eur")
 			continue
 		}
 
 		// Enforce budget cap: skip items priced above maxCost.
 		if sw > maxCost {
-			println("Expensive", sw, "eur")
+			fmt.Println("Expensive", sw, "eur")
 			continue
 		}
 
 		// De-duplicate: skip entries that were already processed earlier.
 		if isKnown := db.AddEdikt(ediktAlldocURL); isKnown {
-			println("Known", sw, "eur")
+			fmt.Println("Known", sw, "eur")
 			continue
 		}
 
