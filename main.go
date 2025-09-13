@@ -75,6 +75,6 @@ func main() {
 
 	// send email
 	if len(body) > 0 {
-		email.SendEmail("edikte@post4me.at", "Edikte: Neuigkeiten des Tages!", body)
+		email.SendEmail("Edikte: Neuigkeiten des Tages!", body)
 	}
 }

@@ -9,8 +9,8 @@ import (
 )
 
 // SendEmail sends a UTF-8 plain text email using STARTTLS when available.
-func SendEmail(to, subject, body string) {
-	host, port, user, pass := loadOrInitMailConfig("mail.conf")
+func SendEmail(subject, body string) {
+	host, port, user, pass, to := loadOrInitMailConfig("mail.conf")
 	from := user
 
 	// Build RFC 5322 message with CRLF line endings
@@ -77,11 +77,12 @@ type MailConfig struct {
 	Port int    `json:"port"`
 	User string `json:"user"`
 	Pass string `json:"pass"`
+	To   string `json:"to"`
 }
 
 // loadOrInitMailConfig reads mail.json.
 // If it does not exist, it writes dummy values and returns an error to force editing.
-func loadOrInitMailConfig(path string) (host string, port int, user, pass string) {
+func loadOrInitMailConfig(path string) (host string, port int, user, pass, to string) {
 	// Try to read existing config
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -92,6 +93,7 @@ func loadOrInitMailConfig(path string) (host string, port int, user, pass string
 				Port: 465,
 				User: "user@example.com",
 				Pass: "change-me",
+				To:   "to@example.com",
 			}
 			b, _ := json.MarshalIndent(dummy, "", "  ")
 			_ = os.WriteFile(path, b, 0o600)
@@ -106,5 +108,5 @@ func loadOrInitMailConfig(path string) (host string, port int, user, pass string
 		panic(err)
 	}
 
-	return cfg.Host, cfg.Port, cfg.User, cfg.Pass
+	return cfg.Host, cfg.Port, cfg.User, cfg.Pass, cfg.To
 }
