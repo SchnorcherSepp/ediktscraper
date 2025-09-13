@@ -9,8 +9,8 @@ import (
 )
 
 // SendEmail sends a UTF-8 plain text email using STARTTLS when available.
-func SendEmail(subject, body string) {
-	host, port, user, pass, to := loadOrInitMailConfig("mail.conf")
+func SendEmail(to, subject, body string) {
+	host, port, user, pass, _ := LoadOrInitMailConfig()
 	from := user
 
 	// Build RFC 5322 message with CRLF line endings
@@ -80,9 +80,11 @@ type MailConfig struct {
 	To   string `json:"to"`
 }
 
-// loadOrInitMailConfig reads mail.json.
+// LoadOrInitMailConfig reads mail.json.
 // If it does not exist, it writes dummy values and returns an error to force editing.
-func loadOrInitMailConfig(path string) (host string, port int, user, pass, to string) {
+func LoadOrInitMailConfig() (host string, port int, user, pass, to string) {
+	path := "mail.conf"
+
 	// Try to read existing config
 	data, err := os.ReadFile(path)
 	if err != nil {

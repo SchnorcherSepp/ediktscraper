@@ -3,6 +3,7 @@ package main
 import (
 	"ediktscraper/email"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -75,6 +76,10 @@ func main() {
 
 	// send email
 	if len(body) > 0 {
-		email.SendEmail("Edikte: Neuigkeiten des Tages!", body)
+		_, _, _, _, tos := email.LoadOrInitMailConfig()
+		for _, to := range strings.Split(tos, ";") {
+			to = strings.TrimSpace(to)
+			email.SendEmail(to, "Edikte: Neuigkeiten des Tages!", body)
+		}
 	}
 }
